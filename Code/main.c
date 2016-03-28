@@ -33,6 +33,6 @@ int main(int argc, char** argv){
         traverse(root);
 
     printf("===================END=====================\n");
-
+    // freeNode(root);
     return 0;
 }

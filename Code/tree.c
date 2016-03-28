@@ -67,7 +67,6 @@ void freeNode(Node* nodePtr){
     freeNode(nodePtr->firstChild);
     freeNode(nodePtr->nextSibling);    
     free(nodePtr);
-    // nodePtr = NULL;
 }
 
 void traverse(Node* rt);

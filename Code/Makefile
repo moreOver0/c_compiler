@@ -33,8 +33,6 @@ syntax-c: $(YFILE)
 
 # 定义的一些伪目标
 .PHONY: clean test
-t2:
-	./parser ../Test/t2.cmm
 test:
 	./parser ../Test/t1.cmm
 	./parser ../Test/t2.cmm

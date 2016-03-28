@@ -112,6 +112,7 @@ Stmt        : Exp SEMI                      { $$ = addToTree(_Stmt, 2, $1, $2); 
             | IF LP Exp RP Stmt ELSE Stmt   { $$ = addToTree(_Stmt, 7, $1, $2, $3, $4, $5, $6, $7); }   //if(表达式) stmt else stmt
             | WHILE LP Exp RP Stmt          { $$ = addToTree(_Stmt, 5, $1, $2, $3, $4, $5); }           //while(表达式) stmt
             | error SEMI                    { syntaxErrorCount++; }
+            | error                         { syntaxErrorCount++; }
             ;
 
 
@@ -152,6 +153,7 @@ Exp         : Exp ASSIGNOP Exp  { $$ = addToTree(_Exp, 3, $1, $2, $3); }
             | ID                { $$ = addToTree(_Exp, 1, $1); }
             | INT               { $$ = addToTree(_Exp, 1, $1); }
             | FLOAT             { $$ = addToTree(_Exp, 1, $1); }
+            | error             { syntaxErrorCount++; }
             ;
 
 Args        : Exp COMMA Args    { $$ = addToTree(_Args, 3, $1, $2, $3); }
