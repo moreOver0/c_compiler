@@ -1,0 +1,11 @@
+*.yy.*
+*.tab.*
+*.swp
+*.o
+*.output
+*.s
+*.S
+*.d
+*.cmm
+parser
+.DS_Store
