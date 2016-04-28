@@ -1,3 +1,6 @@
+#ifndef __TREE_H_
+#define __TREE_H_
+
 typedef enum _kind_of_node {
     _INT, _FLOAT, _ID, 
     _SEMI, _COMMA, _RELOP, _ASSIGNOP,
@@ -33,5 +36,8 @@ typedef struct Node {
 Node* newNode();
 void freeNode(Node* nodePtr);
 void traverse(Node* node);
+Node* addToTree(int nodeTag, int argc, ...);
 
 extern char nodeTagStr[][25];
+
+#endif

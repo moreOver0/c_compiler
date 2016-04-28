@@ -1,5 +1,6 @@
 %locations
 %{
+    #include "tree.h"
     #include "lex.yy.c"  
     #include <stdlib.h>
     #include <stdarg.h>
@@ -8,7 +9,6 @@
     extern int yylineno;
     extern int yycolumn;
 
-    Node* addToTree(int nodeTag, int argc, ...);
     int yyerror(char* msg);
 
     int syntaxErrorCount = 0;

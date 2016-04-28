@@ -1,5 +1,4 @@
-int main()
-{
-    int i = 1;
-    int j = ~i;
-}
+int test()
+ {
+ int _C_ = 0109;
+ }
