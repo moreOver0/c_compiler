@@ -61,7 +61,8 @@ typedef enum _build_rule_of_syntax{
 }RuleTag;
 
 typedef enum _type_of_semantic {
-    type_unknown,
+    type_general,
+    type_unknown_type,
     define_int, define_float, define_struct,
     // type_int, type_float, 
     // type_struct, 

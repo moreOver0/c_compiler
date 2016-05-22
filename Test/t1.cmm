@@ -1,4 +1,11 @@
-int test()
- {
- int _C_ = 0109;
- }
+struct Vector {
+int x;
+int y;
+};
+int setVector(int x1, int y1, int z1)
+{
+struct Vector a, b;
+a.x = x1;
+a.y = y1;
+z = z1;
+}

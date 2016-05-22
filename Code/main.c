@@ -1,6 +1,5 @@
 #include "common.h"
 
-
 extern FILE* yyin;
 extern int yylex(void);
 extern void yyrestart(FILE *input_file);
@@ -20,7 +19,7 @@ int main(int argc, char** argv){
         return 1;
     }
    
-    printf("==================BEGIN====================\n");
+    // printf("==================BEGIN====================\n");
 
     yyrestart(file);
     yyparse();
@@ -28,12 +27,12 @@ int main(int argc, char** argv){
     if(lexicalErrorCount + syntaxErrorCount <= 0){
         // traverse(root);
         semanticCheck();
-        if(semanticErrorCount <= 0){
-            printf("none.");
-        }
+        // if(semanticErrorCount <= 0){
+        //     printf("none.\n");
+        // }
     }
 
-    printf("===================END=====================\n");
+    // printf("===================END=====================\n");
     // freeNode(root);
     return 0;
 }

@@ -39,7 +39,7 @@ typedef struct Type{
 
 extern Type* BASIC_INT;
 extern Type* BASIC_FLOAT;
-extern Type* BASIC_UNKNOWN;
+extern Type* BASIC_UNKNOWN_TYPE;
 
 typedef struct Type Symbol;
 
@@ -56,6 +56,8 @@ bool insertSymbolTable(SymbolTableNode* node);
 bool insertSymbolTableType(Type* symbol);
 Symbol* findSymbolTable(char* name);
 
+bool checkType(Type* t1, Type* t2);
+void showType(Type* t);
 
 Type* newType();
 // void freeType(Type* t);

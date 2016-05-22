@@ -1,6 +1,8 @@
 #ifndef __COMMON_H 
 #define __COMMON_H
 
+// #define _DEBUG
+
 
 typedef int bool;
 extern const int false;

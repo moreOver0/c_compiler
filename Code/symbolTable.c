@@ -6,7 +6,7 @@ SymbolTableNode** symbolTable;
 
 Type* BASIC_INT;
 Type* BASIC_FLOAT;
-Type* BASIC_UNKNOWN;
+Type* BASIC_UNKNOWN_TYPE;
 
 void initSymbolTable(){
     symbolTable = (SymbolTableNode**)malloc(sizeof(SymbolTableNode*)*SIZE);
@@ -20,13 +20,20 @@ void initSymbolTable(){
     BASIC_FLOAT->name = "float";
     BASIC_FLOAT->typeTag = define_float;
 
-    BASIC_UNKNOWN = newType();
-    BASIC_UNKNOWN->name = "unknown";
-    BASIC_UNKNOWN->typeTag = type_unknown;
+    BASIC_UNKNOWN_TYPE = newType();
+    BASIC_UNKNOWN_TYPE->name = "unknown type";
+    BASIC_UNKNOWN_TYPE->typeTag = type_unknown_type;
 }
 
 Symbol* findSymbolTable(char* name){
-    if(name == NULL) return NULL;
+    if(name == NULL) 
+        assert(0);
+        // return NULL;
+
+#ifdef _DEBUG
+printf("finding '%s'\n", name);
+#endif
+
     unsigned int hashCode = hashPJW(name);
     SymbolTableNode* bucket = symbolTable[hashCode];
     while(bucket != NULL){
@@ -44,10 +51,10 @@ static bool alreadyExists(char* name){
     return false;
 }
 
-// 两个无名struct " struct <cnt>" 不加进去
 
 bool insertSymbolTable(SymbolTableNode* node){
-    if(node==NULL) return false;
+    if(node==NULL) 
+        return false;
     Symbol* symbol = node->symbol;
     if(symbol->name == NULL) return false;
 
@@ -60,10 +67,72 @@ bool insertSymbolTable(SymbolTableNode* node){
 }
 
 bool insertSymbolTableType(Type* symbol){
+    if(symbol == NULL) assert(0);
+    if(symbol->name == NULL) return true;
     SymbolTableNode* node = newSymbolTableNode();
     node->symbol = symbol;
     return insertSymbolTable(node);
 }
+
+
+bool checkType(Type* t1, Type* t2){
+    if(t1 == NULL || t2 == NULL){
+        return true;
+    }else if(t1 == t2){
+        return true;
+    }
+    if(t1->typeTag == type_general && (t2 == BASIC_INT || t2 == BASIC_FLOAT || t2->typeTag == define_struct || t2 == BASIC_UNKNOWN_TYPE)){
+        return t1->myType == t2;
+    }
+    if(t2->typeTag == type_general && (t1 == BASIC_INT || t1 == BASIC_FLOAT || t1->typeTag == define_struct || t1 == BASIC_UNKNOWN_TYPE)){
+        return t2->myType == t1;
+    }
+
+    if(t1->typeTag != t2->typeTag)
+        return false;
+
+    if(t1->typeTag == type_general){
+        return checkType(t1->myType, t2->myType);
+    }else if(t1->typeTag == type_array){
+        return checkType(t1->array.element, t2->array.element);
+    }else if(t1->typeTag == define_struct){
+        if(t1->structure.elementCount != t2->structure.elementCount)
+            return false;
+        for(int i = 0; i < t1->structure.elementCount; ++i){
+            if(!checkType(t1->structure.element[i], t2->structure.element[i])){
+                return false;
+            }
+        }
+        return true;
+    }
+    return false;
+}
+
+void showType(Type* t){
+    printf("\t\t\t\t\t\t\t\t\t");
+    if(t == NULL){
+        printf("NULL\n");return;
+    }
+    if(t == BASIC_INT){printf("BASIC_INT\n");}
+    else if(t == BASIC_FLOAT){printf("BASIC_FLOAT\n");}
+    else if(t == BASIC_UNKNOWN_TYPE){printf("BASIC_UNKNOWN_TYPE\n");}
+    else if(t->typeTag == define_struct){
+        printf("struct %s \n", t->name);
+    }
+    else if(t->typeTag == type_array){
+        printf("[ %d ]\n", t->array.size);
+        showType(t->array.element);
+    }
+    else if(t->typeTag == type_general){
+        printf("%s is instance of \n", t->name);
+        showType(t->myType);
+    }
+    else{
+       assert(0); 
+    }
+}
+
+
 
 Type* newType(){
     Type* res = (Type*)malloc(sizeof(Type));
