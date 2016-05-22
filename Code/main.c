@@ -1,16 +1,15 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include "tree.h"
+#include "common.h"
+
 
 extern FILE* yyin;
 extern int yylex(void);
-extern void yyrestart (FILE *input_file);
-extern int yyparse (void);
+extern void yyrestart(FILE *input_file);
+extern int yyparse(void);
 extern int yylineno;
 extern int yycolumn;
-extern Node* root;
-extern int lexicalErrorCount;
-extern int syntaxErrorCount;
+
+const int false = 0;
+const int true = 1;
 
 int main(int argc, char** argv){
     if(argc < 2)
@@ -21,16 +20,18 @@ int main(int argc, char** argv){
         return 1;
     }
    
-
     printf("==================BEGIN====================\n");
 
     yyrestart(file);
     yyparse();
 
-    // printf("lexical error count: %d\n", lexicalErrorCount);
-    // printf(" syntax error count: %d\n", syntaxErrorCount);
-    if(lexicalErrorCount + syntaxErrorCount == 0)
-        traverse(root);
+    if(lexicalErrorCount + syntaxErrorCount <= 0){
+        // traverse(root);
+        semanticCheck();
+        if(semanticErrorCount <= 0){
+            printf("none.");
+        }
+    }
 
     printf("===================END=====================\n");
     // freeNode(root);

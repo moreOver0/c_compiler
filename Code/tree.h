@@ -1,42 +1,37 @@
-#ifndef __TREE_H_
-#define __TREE_H_
+#ifndef __TREE_H
+#define __TREE_H
 
-typedef enum _kind_of_node {
-    _INT, _FLOAT, _ID, 
-    _SEMI, _COMMA, _RELOP, _ASSIGNOP,
-    _PLUS, _MINUS, _STAR, _DIV, _AND, _OR, _NOT, _DOT,
-    _LP, _RP, _LB, _RB, _LC, _RC,
-    _TYPE, _STRUCT, _RETURN, _IF, _ELSE, _WHILE,
-
-    _Program, _ExtDefList, _ExtDef, _ExtDecList,
-    _Specifier, _StructSpecifier, _OptTag, _Tag,
-    _VarDec, _FunDec, _VarList, _ParamDec,
-    _CompSt, _StmtList, _Stmt,
-    _DefList, _Def, _DecList, _Dec,
-    _Exp, _Args
-}NodeTag;
+#include "common.h"
 
 /* Definition of syntax tree node */
 typedef struct Node {
     int line, column;
-    int isToken;
-    NodeTag tag; //
-    char* text; //原文
+    int isToken;        /* if production of lexical.l */
+    NodeTag tag; 
+    RuleTag rule;
+    char* text;         /* 原文 */
     union {
         float floatVal;
         int intVal;
     };
 
-
     struct Node* firstChild;
     struct Node* nextSibling;
+
+    // struct {
+        Type *type;
+        // const char *name;
+        // int lineno;
+    // }semantic;
+
+
 }Node;
 
 
 Node* newNode();
-void freeNode(Node* nodePtr);
+// void freeNode(Node* nodePtr);
 void traverse(Node* node);
-Node* addToTree(int nodeTag, int argc, ...);
+Node* addToTree(int nodeTag, int rule, int argc, ...);
 
 extern char nodeTagStr[][25];
 

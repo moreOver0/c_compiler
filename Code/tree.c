@@ -1,7 +1,4 @@
-#include "tree.h"
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include "common.h"
 
 char nodeTagStr[][25] = {
     [_INT] = "INT",
@@ -61,15 +58,15 @@ Node* newNode(){
     return tmp;
 }
 
-void freeNode(Node* nodePtr){
-    if(nodePtr == NULL)
-        return;
-    freeNode(nodePtr->firstChild);
-    freeNode(nodePtr->nextSibling);    
-    free(nodePtr);
-}
+// void freeNode(Node* nodePtr){
+//     if(nodePtr == NULL)
+//         return;
+//     freeNode(nodePtr->firstChild);
+//     freeNode(nodePtr->nextSibling);    
+//     free(nodePtr);
+//     nodePtr = NULL:
+// }
 
-void traverse(Node* rt);
 void traverseSub(Node* node, int level);
 
 void traverse(Node* rt){
