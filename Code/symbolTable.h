@@ -18,10 +18,8 @@ typedef struct Type{
             int argc;
             /* array of arguments */
             struct Type** argv;
-            // TypeTag returnType;
             /* point to type of return-value if return a structure */
             struct Type* ret;
-            
         }function;
 
         /* if definition of structure */
@@ -58,6 +56,7 @@ Symbol* findSymbolTable(char* name);
 
 bool checkType(Type* t1, Type* t2);
 void showType(Type* t);
+int computeSizeByByte(Type* t);
 
 Type* newType();
 // void freeType(Type* t);

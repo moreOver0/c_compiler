@@ -85,5 +85,37 @@ typedef enum _kind_of_node {
     _Exp, _Args
 }NodeTag;
 
+typedef enum _kind_of_operand{
+    function,
+    variable, constant, address, 
+    tempVariable, label
+}OperandTag;
+
+typedef enum _kind_of_intercode_op{
+    IR_LABEL,
+    IR_GOTO,
+    IR_IF_GOTO,
+
+    IR_FUNC,
+    IR_PARAM,
+    IR_DEC,
+    IR_RETURN,
+    IR_ARG,
+    IR_CALL_ASSIGN,
+
+    IR_ASSIGN,
+    IR_ADD,
+    IR_SUB,
+    IR_MUL,
+    IR_DIV,
+    
+    // IR_ADDR,         // x = &y
+    IR_READ_FROM_ADDR,  // x = *y
+    IR_WRITE_TO_ADDR,   // *x = y
+
+    IR_READ,
+    IR_WRITE
+}InterCodeTag;
+
 
 #endif

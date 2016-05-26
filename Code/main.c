@@ -27,9 +27,10 @@ int main(int argc, char** argv){
     if(lexicalErrorCount + syntaxErrorCount <= 0){
         // traverse(root);
         semanticCheck();
-        // if(semanticErrorCount <= 0){
-        //     printf("none.\n");
-        // }
+        if(semanticErrorCount <= 0){
+            getIR(argv[2]);
+            // printf("none.\n");
+        }
     }
 
     // printf("===================END=====================\n");

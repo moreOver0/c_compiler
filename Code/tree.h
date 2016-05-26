@@ -18,12 +18,22 @@ typedef struct Node {
     struct Node* firstChild;
     struct Node* nextSibling;
 
-    // struct {
-        Type *type;
-        // const char *name;
-        // int lineno;
-    // }semantic;
+    Type *type;
 
+    bool arrayAssign;
+    Type* arraySymbol;
+    int arrayLevel;
+    union{
+        Operand* place;
+        struct{
+            Operand** argList;
+            int argCount;
+        };    
+
+        // struct{
+            // Operand* label_true, label_false;
+        // };
+    };
 
 }Node;
 
