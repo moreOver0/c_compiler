@@ -25,10 +25,15 @@
 /*declared tokens*/
 
 %token      <node> INT FLOAT TYPE ID SEMI COMMA
-%right      <node> ASSIGNOP NOT
-%left       <node> PLUS MINUS STAR DIV RELOP AND OR 
-%left       <node> DOT LP RP LB RB LC RC
+%right      <node> ASSIGNOP
+%left       <node> OR AND RELOP
+%left       <node> PLUS MINUS 
+%left       <node> STAR DIV 
+%right      <node> NOT
+%left       <node> LP RP DOT LB RB LC RC
 %nonassoc   <node> STRUCT RETURN IF ELSE WHILE
+
+
 
 /*declared non-terminals*/
 
@@ -135,8 +140,8 @@ Exp         : Exp ASSIGNOP Exp  { $$ = addToTree(_Exp, Exp__Exp_ASSIGNOP_Exp, 3,
             | Exp RELOP Exp     { $$ = addToTree(_Exp, Exp__Exp_RELOP_Exp, 3, $1, $2, $3); }
             | Exp PLUS Exp      { $$ = addToTree(_Exp, Exp__Exp_PLUS_Exp, 3, $1, $2, $3); }
             | Exp MINUS Exp     { $$ = addToTree(_Exp, Exp__Exp_MINUS_Exp, 3, $1, $2, $3); }
-            | Exp STAR Exp      { $$ = addToTree(_Exp, Exp__Exp_STAR_Exp, 3, $1, $2, $3); }
             | Exp DIV Exp       { $$ = addToTree(_Exp, Exp__Exp_DIV_Exp, 3, $1, $2, $3); }
+            | Exp STAR Exp      { $$ = addToTree(_Exp, Exp__Exp_STAR_Exp, 3, $1, $2, $3); }
             | LP Exp RP         { $$ = addToTree(_Exp, Exp__LP_Exp_RP, 3, $1, $2, $3); }
             | MINUS Exp         { $$ = addToTree(_Exp, Exp__MINUS_Exp, 2, $1, $2); }
             | NOT Exp           { $$ = addToTree(_Exp, Exp__NOT_Exp, 2, $1, $2); }
