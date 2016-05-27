@@ -2,7 +2,7 @@
 #define __COMMON_H
 
 // #define _DEBUG
-#define _TRA_DEBUG
+// #define _TRA_DEBUG
 
 typedef int bool;
 extern const int false;

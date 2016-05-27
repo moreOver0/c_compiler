@@ -117,7 +117,6 @@ typedef InterCodeNode* Code;
 
 
 void getIR(char* fileName){
-    printf("output path %s\n", fileName);
     anyStruct = false;
     irHead = translate(root);
     if(anyStruct){
@@ -479,6 +478,7 @@ static Operand* getVarOperand(Type* a){
     }
 }
 
+
 static InterCodeNode* exp__exp_lb_exp_rb(Node* n){
 #ifdef _TRA_DEBUG
     printf("%-3d  %s\n", n->line, handlestr[n->rule]);
@@ -489,7 +489,13 @@ static InterCodeNode* exp__exp_lb_exp_rb(Node* n){
     n->arrayLevel++;
     Node* exp = getChild(n);
     Code code = NULL;
-    if(exp->type->typeTag == type_general){ // exp1 is id
+#ifdef _TRA_DEBUG
+printf("what the elment\n");
+showType(exp->type->myType);
+#endif
+    if(exp->rule == Exp__ID){
+        // printf("di yi wei\n");
+
         Operand* tmp = newTemp();
         exp->place = tmp; // useless tmp
         translate(exp);
@@ -503,42 +509,45 @@ static InterCodeNode* exp__exp_lb_exp_rb(Node* n){
             Operand* offset = newTemp();
             code = concat(code, newInterCodeNodeWithInfo(IR_MUL, offset, t1, newOperandConstant(computeSizeByByte(n->type))));
             if(n->arrayAssign){
-                // code = concat(code, newInterCodeNodeWithInfo(IR_ADD, n->place, newOperandAddr(newOperandVar(n->arraySymbol)), offset));
+                // printf("arrayAssign\n");
                 code = concat(code, newInterCodeNodeWithInfo(IR_ADD, n->place, getVarOperand(n->arraySymbol), offset));
             }else{
+                // printf("not arrayAssign\n");
                 Operand* tmpaddr = newTemp();
-                // code = concat(code, newInterCodeNodeWithInfo(IR_ADD, tmpaddr, newOperandAddr(newOperandVar(n->arraySymbol)), offset));
                 code = concat(code, newInterCodeNodeWithInfo(IR_ADD, tmpaddr, getVarOperand(n->arraySymbol), offset));
                 code = concat(code, newInterCodeNodeWithInfo(IR_READ_FROM_ADDR, n->place, tmpaddr, NULL));
             }
         }else{
+            // printf("arrayLevel!=1 && di yi wei\n");
             code = concat(code, newInterCodeNodeWithInfo(IR_MUL, n->place, t1, newOperandConstant(computeSizeByByte(n->type))));
         }
 
     }
     else{
+        // printf("not di yi wei\n");
+
         Operand* t1 = newTemp();
         exp->place = t1;
-        exp->arrayLevel = n->arrayLevel+1;
+        exp->arrayLevel = n->arrayLevel;
         code = translate(exp); t1 = exp->place;
         n->arraySymbol = exp->arraySymbol;
 
         Operand* t2 = newTemp();
         Node* index = getChild3(n);
         index->place = t2;
-        code = concat(code, translate(index)); t2 = exp->place;
+        code = concat(code, translate(index)); t2 = index->place;
         Operand* t3 = newTemp();
         code = concat(code, newInterCodeNodeWithInfo(IR_MUL, t3, t2, newOperandConstant(computeSizeByByte(n->type))));
+
+
         if(n->arrayLevel == 1){
             Operand* t4 = newTemp();
             code = concat(code, newInterCodeNodeWithInfo(IR_ADD, t4, t1, t3));
             if(n->arrayAssign){
-                // code = concat(code, newInterCodeNodeWithInfo(IR_ADD, n->place, newOperandAddr(newOperandVar(n->arraySymbol)), t4));
                 code = concat(code, newInterCodeNodeWithInfo(IR_ADD, n->place, getVarOperand(n->arraySymbol), t4));
             }else{
                 Operand* tmpaddr = newTemp();
-                // code = concat(code, newInterCodeNodeWithInfo(IR_ADD, n->place, newOperandAddr(newOperandVar(n->arraySymbol)), t4));
-                code = concat(code, newInterCodeNodeWithInfo(IR_ADD, n->place, getVarOperand(n->arraySymbol), t4));
+                code = concat(code, newInterCodeNodeWithInfo(IR_ADD, tmpaddr, getVarOperand(n->arraySymbol), t4));
                 code = concat(code, newInterCodeNodeWithInfo(IR_READ_FROM_ADDR, n->place, tmpaddr, NULL));
             }
         }else{
@@ -703,10 +712,11 @@ static InterCodeNode* translate_Cond(Node* exp, Operand* ltrue, Operand* lfalse)
 #ifdef _TRA_DEBUG
     printf("%-3d  translate_Cond %s\n", exp->line, handlestr[exp->rule]);
 #endif
-
+    // printf("%d  from translate_Cond\n", exp->line);
 
     RuleTag tag = exp->rule;
     if(Exp__Exp_RELOP_Exp == tag){ // handle array
+        // printf("Exp__Exp_RELOP_Exp\n");
         Operand* t1 = newTemp();
         Operand* t2 = newTemp();
         Node* exp1 = getChild(exp); exp1->place = t1;
@@ -724,9 +734,11 @@ static InterCodeNode* translate_Cond(Node* exp, Operand* ltrue, Operand* lfalse)
         return code;
 
     }else if(Exp__NOT_Exp == tag){
+        // printf("Exp__NOT_Exp\n");
         return translate_Cond(exp, lfalse, ltrue);
 
     }else if(Exp__Exp_AND_Exp == tag){
+        // printf("Exp__Exp_AND_Exp\n");
         Operand* label1 = newLabel();
         Code code1 = translate_Cond(getChild(exp), label1, lfalse);
         Code code2 = translate_Cond(getChild3(exp), ltrue, lfalse);
@@ -735,6 +747,7 @@ static InterCodeNode* translate_Cond(Node* exp, Operand* ltrue, Operand* lfalse)
         return code;
 
     }else if(Exp__Exp_OR_Exp == tag){
+        // printf("Exp__Exp_OR_Exp\n");
         Operand* label1 = newLabel();
         Code code1 = translate_Cond(getChild(exp), ltrue, label1);
         Code code2 = translate_Cond(getChild3(exp), ltrue, lfalse);
@@ -742,7 +755,8 @@ static InterCodeNode* translate_Cond(Node* exp, Operand* ltrue, Operand* lfalse)
         code = concat(code, code2);
         return code;
 
-    }else{ // handle array
+    }else{ 
+        // printf("other case\n");
         Operand* t1 = newTemp();
         exp->place = t1;
         Code code = translate(exp);
@@ -752,7 +766,7 @@ static InterCodeNode* translate_Cond(Node* exp, Operand* ltrue, Operand* lfalse)
         InterCode* ic = newInterCode(IR_IF_GOTO, ltrue, t1, newOperandConstant(0));
         ic->relop = op;
         code = concat(code, newInterCodeNodeWithIC(ic));
-        code = concat(code, newInterCodeNodeWithInfo(IR_LABEL, lfalse, NULL, NULL));
+        code = concat(code, newInterCodeNodeWithInfo(IR_GOTO, lfalse, NULL, NULL));
         return code;
     }
 }

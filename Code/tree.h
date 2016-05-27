@@ -20,6 +20,12 @@ typedef struct Node {
 
     Type *type;
 
+    Type** funcStdArgv;
+    int funcArgCount;
+    int funcArgIndex;
+
+
+    // lab3
     bool arrayAssign;
     Type* arraySymbol;
     int arrayLevel;
@@ -29,10 +35,6 @@ typedef struct Node {
             Operand** argList;
             int argCount;
         };    
-
-        // struct{
-            // Operand* label_true, label_false;
-        // };
     };
 
 }Node;

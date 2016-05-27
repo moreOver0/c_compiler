@@ -26,7 +26,9 @@
 
 %token      <node> INT FLOAT TYPE ID SEMI COMMA
 %right      <node> ASSIGNOP
-%left       <node> OR AND RELOP
+%left       <node> OR 
+%left       <node> AND 
+%left       <node> RELOP
 %left       <node> PLUS MINUS 
 %left       <node> STAR DIV 
 %right      <node> NOT

@@ -200,10 +200,6 @@ static const int maxArgc = 12;
 static int funcArgIndex;
 Type** funcArgv;
 
-static Type** stdArgv;
-static int argIndex;
-static int argCount;
-
 
 #ifdef _DEBUG
     #define handle(x)  \
@@ -733,9 +729,9 @@ static void exp__id_lp_args_rp(Node* node){
     }else if(func->typeTag != type_func){
         semanticError(node->line, "'%s' must be a function\n", id->text);
     }else{
-        stdArgv = func->function.argv;
-        argCount = func->function.argc;
-        argIndex = 0;
+        args->funcStdArgv = func->function.argv;
+        args->funcArgCount = func->function.argc;
+        args->funcArgIndex = 0;
         handle(args);
         node->type = func->function.ret;
     }
@@ -773,6 +769,10 @@ showType(exp2->type);
         }else{
             node->type = newType();
             node->type->myType = exp1->type->myType->array.element;
+#ifdef _DEBUG
+printf("what the elment\n");
+showType(node->type->myType);
+#endif
         }
     }
 }
@@ -832,19 +832,23 @@ static void exp__float(Node* node){
 
 static void args__exp_comma_args(Node* node){
     if(node == NULL) return;
+
     Node* exp = node->firstChild;
     Node* args = exp->nextSibling->nextSibling;
     handle(exp);
     Type* t = exp->type;
-    if(argIndex >= argCount){
-        semanticError(node->line, "Number of arguments mismatched\n", NULL);
-    }else if(!checkType(t, stdArgv[argIndex])){
+    if(node->funcArgIndex >= node->funcArgCount){
+        semanticError(node->line, "Number of arguments mismatched 1\n", NULL);
+    }else if(!checkType(t, node->funcStdArgv[node->funcArgIndex])){
         semanticError(node->line, "Type of argument mismatched\n", NULL);
     }else{
-        argIndex++;
+        node->funcArgIndex++;
+        args->funcStdArgv = node->funcStdArgv;
+        args->funcArgCount = node->funcArgCount;
+        args->funcArgIndex = node->funcArgIndex;
         handle(args);
     }
- 
+
 }
 
 static void args__exp(Node* node){
@@ -853,15 +857,15 @@ static void args__exp(Node* node){
     handle(exp);
     Type* t = exp->type;
     bool good = true;
-    if(argIndex >= argCount){
+    if(node->funcArgIndex >= node->funcArgCount){
         good = false;
-        semanticError(node->line, "Number of arguments mismatched\n", NULL);
-    }else if(!checkType(t, stdArgv[argIndex])){
+        semanticError(node->line, "Number of arguments mismatched 2\n", NULL);
+    }else if(!checkType(t, node->funcStdArgv[node->funcArgIndex])){
         semanticError(node->line, "Type of argument mismatched\n", NULL);
     }
-    argIndex++;
-    if(good && argCount != argIndex){
-        semanticError(node->line, "Number of arguments mismatched\n", NULL);        
+    node->funcArgIndex++;
+    if(good && node->funcArgCount != node->funcArgIndex){
+        semanticError(node->line, "Number of arguments mismatched 3 \n", NULL);        
     }
 }
 
