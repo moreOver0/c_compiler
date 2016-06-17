@@ -9,4 +9,5 @@
 *.cmm
 parser
 .DS_Store
-.ir
+*.ir
+*.s
