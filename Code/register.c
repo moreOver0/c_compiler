@@ -24,7 +24,11 @@ int getOffset(Operand* o, Type* currentFunc){
     }else if(o->tag == tempVariable){
         int tmp = o->no - currentFunc->function.tempBeginNo;
         return currentFunc->function.dataSize - tmp * 4;
+    }else if(o->tag == address){
+        // printf("\n\n%d\n\n", getOffset(o->pointTo, currentFunc));
+        return getOffset(o->pointTo, currentFunc);
     }else{
+
         assert(0);
     }
 }
@@ -88,16 +92,27 @@ void getRegister(FILE* fileOut, InterCode* ic, Type* currentFunc){
     
     }else if(IR_ADD == ic->tag || IR_SUB == ic->tag){
         // 常数不用放进寄存器
-        if(o1->tag != constant)
+        if(o1->tag == address){
+            fprintf(fileOut, "addi $t1, $sp, %d\n", getOffset(o1->pointTo, currentFunc));
+        }
+        else if(o1->tag != constant)
             fprintf(fileOut, "lw $t1, %d($sp)\n", getOffset(o1, currentFunc));
-        if(o2->tag != constant)
+        if(o2->tag == address){
+            fprintf(fileOut, "addi $t2, $sp, %d\n", getOffset(o2->pointTo, currentFunc));
+        }
+        else if(o2->tag != constant)
             fprintf(fileOut, "lw $t2, %d($sp)\n", getOffset(o2, currentFunc));
 
     }else if(IR_ASSIGN == ic->tag){
         // 常数不用放进寄存器
-        if(o1->tag != constant)
+        if(o1->tag == address)
+            fprintf(fileOut, "addi $t1, $sp, %d\n", getOffset(o1->pointTo, currentFunc));
+        else if(o1->tag != constant)
             fprintf(fileOut, "lw $t1, %d($sp)\n", getOffset(o1, currentFunc));
     }else if(IR_WRITE == tag){
-        fprintf(fileOut, "lw $t0, %d($sp)\n", getOffset(tar, currentFunc));
+        if(tar->tag != constant)
+            fprintf(fileOut, "lw $t0, %d($sp)\n", getOffset(tar, currentFunc));
+        else 
+            fprintf(fileOut, "li $t0, %d\n", tar->value);
     }
 }

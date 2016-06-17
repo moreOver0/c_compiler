@@ -1,10 +1,5 @@
 #include "common.h"
 
-/*
-    InterCodeNode* irHead;
-
-
- */
 
 void getAsm(char* fileName){
     FILE* fileOut = fopen(fileName, "w");
@@ -24,7 +19,7 @@ void getAsm(char* fileName){
 
     Type* currentFunc = NULL;
 
-    // int i = 1;
+    int i = 1;
     while((begin && p != irHead) || !begin){
         begin = true;
         InterCode* ic = p->ic;
@@ -34,7 +29,7 @@ void getAsm(char* fileName){
         Operand* o2 = ic->o2;
         char* relop = ic->relop;
 
-        // printf("%d\n", i);i++;
+        printf("%d\n", i);i++;
 
         if(IR_FUNC == tag){
             currentFunc = tar->func;
@@ -84,17 +79,14 @@ void getAsm(char* fileName){
         }else if(IR_ARG == tag){
             // need to push the value of arguments into stack (cause of no array or structure)
             fprintf(fileOut, "sw %s, %d($sp)\n", registerStr[rtar], argOffset+dataSize+tempSize);
-            argOffset += 4;
+            argOffset -= 4;
         }else if(IR_CALL_ASSIGN == tag){
-            // fprintf(fileOut, "sw $ra, 0($sp)\n");
             fprintf(fileOut, "addi $sp, $sp, %d\n", dataSize+tempSize-4*(o1->func->function.argc));
             fprintf(fileOut, "jal %s\n", o1->func->name);
             fprintf(fileOut, "addi $sp, $sp, %d\n", (-1)*(dataSize+tempSize-4*(o1->func->function.argc)));
             fprintf(fileOut, "lw $ra, 0($sp)\n");
 
             if(tar != NULL){
-                // fprintf(fileOut, "move %s, $v0\n", registerStr[rtar]);    
-                // fprintf(fileOut, "sw %s, %d($sp)\n", registerStr[rtar], ); 
                 fprintf(fileOut, "sw $v0, %d($sp)\n", getOffset(tar, currentFunc)); 
             }
 
@@ -106,6 +98,8 @@ void getAsm(char* fileName){
             }
             fprintf(fileOut, "sw %s, %d($sp)\n", registerStr[rtar], getOffset(tar, currentFunc));
         }else if(IR_ADD == tag){
+            fprintf(fileOut, "move %s, %s\n", registerStr[rtar], registerStr[ZERO]);  
+
             if(constant == o2->tag && constant != o1->tag){
                 fprintf(fileOut, "addi %s, %s, %d\n", registerStr[rtar], registerStr[ro1], o2->value);  
             }else if(constant == o1->tag && constant != o2->tag){
@@ -119,6 +113,8 @@ void getAsm(char* fileName){
             fprintf(fileOut, "sw %s, %d($sp)\n", registerStr[rtar], getOffset(tar, currentFunc));
 
         }else if(IR_SUB == tag){
+            fprintf(fileOut, "move %s, %s\n", registerStr[rtar], registerStr[ZERO]);  
+
             if(constant == o2->tag && constant != o1->tag){
                 fprintf(fileOut, "addi %s, %s, %d\n", registerStr[rtar], registerStr[ro1], (-1)*(o2->value));  
             }else if(constant == o1->tag && constant != o2->tag){
@@ -138,7 +134,7 @@ void getAsm(char* fileName){
 
         }else if(IR_DIV == tag){
             fprintf(fileOut, "div %s, %s\n", registerStr[ro1], registerStr[ro2]);
-            fprintf(fileOut, "mflo %s", registerStr[rtar]);
+            fprintf(fileOut, "mflo %s\n", registerStr[rtar]);
             fprintf(fileOut, "sw %s, %d($sp)\n", registerStr[rtar], getOffset(tar, currentFunc));
 
         }else if(IR_READ_FROM_ADDR  == tag){
@@ -148,20 +144,14 @@ void getAsm(char* fileName){
         }else if(IR_WRITE_TO_ADDR  == tag){
             fprintf(fileOut, "sw %s, 0(%s)\n", registerStr[ro1], registerStr[rtar]);
         }else if(IR_READ == tag){
-            // fprintf(fileOut, "sw $ra, 0($sp)\n");
-            // fprintf(fileOut, "addi $sp, $sp, -4\n");
             fprintf(fileOut, "jal read\n");
-            // fprintf(fileOut, "addi $sp, $sp, 4\n");
             fprintf(fileOut, "lw $ra, 0($sp)\n");
 
             fprintf(fileOut, "sw $v0, %d($sp)\n", getOffset(tar, currentFunc));
 
         }else if(IR_WRITE == tag){
             fprintf(fileOut, "move $a0, %s\n", registerStr[rtar]);
-            // fprintf(fileOut, "sw $ra, 0($sp)\n");
-            // fprintf(fileOut, "addi $sp, $sp, -4\n");
             fprintf(fileOut, "jal write\n");
-            // fprintf(fileOut, "addi $sp, $sp, 4\n");
             fprintf(fileOut, "lw $ra, 0($sp)\n");
         }
         p = p->next;

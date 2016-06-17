@@ -64,9 +64,8 @@ typedef enum _type_of_semantic {
     type_general,
     type_unknown_type,
     define_int, define_float, define_struct,
-    // type_int, type_float, 
-    // type_struct, 
-    type_array,// type_subarray,
+
+    type_array,
     type_func
 }TypeTag;
 

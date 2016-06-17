@@ -129,6 +129,7 @@ void traverseIR(FILE* f){
     int funcCount = 0;
     Type* funcList[30];
 
+    int i = 1;
     while((begin && p != irHead) || !begin){
         begin = true;
         InterCode* ic = p->ic;
@@ -137,6 +138,8 @@ void traverseIR(FILE* f){
         Operand* o1 = ic->o1;
         Operand* o2 = ic->o2;
         char* relop = ic->relop;
+
+        printf("%d\t  ", i);i++;
 
         if(IR_FUNC == tag && (tar->func != lastFunc || lastFunc == NULL)){
             if(lastFunc != NULL){
@@ -191,11 +194,11 @@ void traverseIR(FILE* f){
     }
 
     if(lastFunc != NULL){
-    lastFunc->function.tempSize = -4 * (tempVariableCount - lastTempCount);
+        lastFunc->function.tempSize = -4 * (tempVariableCount - lastTempCount);
     }
 
     for(int i = 0; i < funcCount; ++i){
-        fprintf(f, "%s (tempSize %d  %d)\n", funcList[i]->name, funcList[i]->function.tempSize, funcList[i]->function.tempBeginNo);
+        fprintf(f, "%s (tempSize %d  %d)\n", funcList[i]->name, -1 * (funcList[i]->function.tempSize), funcList[i]->function.tempBeginNo);
     }
 }
 

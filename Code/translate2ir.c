@@ -264,7 +264,11 @@ static InterCodeNode* dec__vardec(Node* n){
     Type* var = n->type;
     Code code = NULL;
     int size = computeSizeByByte(var);
-    var->offset = currentFunction->function.dataSize;
+    if(var->myType->typeTag == type_array || var->myType->typeTag == define_struct){
+        var->offset = currentFunction->function.dataSize - size + 4;
+    }else{
+        var->offset = currentFunction->function.dataSize;
+    }
     currentFunction->function.dataSize -= size;
     if(!(var->myType == BASIC_INT || var->myType == BASIC_FLOAT)){
         code = newInterCodeNodeWithInfo(IR_DEC, newOperandVar(var), newOperandConstant(size), NULL);
