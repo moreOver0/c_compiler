@@ -129,7 +129,7 @@ void traverseIR(FILE* f){
     int funcCount = 0;
     Type* funcList[30];
 
-    int i = 1;
+    // int i = 1;
     while((begin && p != irHead) || !begin){
         begin = true;
         InterCode* ic = p->ic;
@@ -139,7 +139,7 @@ void traverseIR(FILE* f){
         Operand* o2 = ic->o2;
         char* relop = ic->relop;
 
-        printf("%d\t  ", i);i++;
+        // printf("%d\t  ", i);i++;
 
         if(IR_FUNC == tag && (tar->func != lastFunc || lastFunc == NULL)){
             if(lastFunc != NULL){

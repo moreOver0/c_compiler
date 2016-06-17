@@ -19,7 +19,7 @@ void getAsm(char* fileName){
 
     Type* currentFunc = NULL;
 
-    int i = 1;
+    // int i = 1;
     while((begin && p != irHead) || !begin){
         begin = true;
         InterCode* ic = p->ic;
@@ -29,7 +29,7 @@ void getAsm(char* fileName){
         Operand* o2 = ic->o2;
         char* relop = ic->relop;
 
-        printf("%d\n", i);i++;
+        // printf("%d\n", i);i++;
 
         if(IR_FUNC == tag){
             currentFunc = tar->func;
