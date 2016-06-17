@@ -29,6 +29,10 @@ typedef struct InterCode{
     Operand* o2;
     char* relop;
 
+    int rtar;
+    int ro1;
+    int ro2;
+
 }InterCode;
 
 typedef struct InterCodeNode{
@@ -49,6 +53,7 @@ InterCodeNode* newInterCodeNodeWithInfo(InterCodeTag tag, Operand* tar, Operand*
 InterCode* newInterCode(InterCodeTag tag, Operand* tar, Operand* o1, Operand* o2);
 
 
+char* printOperand(Operand* o);
 
 extern InterCodeNode* irHead;
 void traverseIR();

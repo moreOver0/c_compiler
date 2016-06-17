@@ -68,6 +68,7 @@ InterCodeNode* newInterCodeNodeWithIC(InterCode* ic){
 
 InterCode* newInterCode(InterCodeTag tag, Operand* tar, Operand* o1, Operand* o2){
     InterCode* tmp = (InterCode*)malloc(sizeof(InterCode));
+    memset(tmp, 0, sizeof(InterCode));
     tmp->tag = tag, tmp->target = tar, tmp->o1 = o1, tmp->o2 = o2;
     tmp->relop = NULL;
     return tmp;
@@ -101,7 +102,8 @@ char* printOperand(Operand* o){
         }
         sprintf(s, "t%d", o->no);
     }
-    else if(o->tag == variable) sprintf(s, "%s", o->var->name);
+    // else if(o->tag == variable) sprintf(s, "%s", o->var->name);
+    else if(o->tag == variable) sprintf(s, "%s(%d)", o->var->name, o->var->offset);
     else if(o->tag == constant) sprintf(s, "#%d", o->value);
     else if(o->tag == address){ sprintf(s, "&%s", printOperand(o->pointTo)); }
     else if(o->tag == function) sprintf(s, "%s", o->func->name);
@@ -119,6 +121,14 @@ void traverseIR(FILE* f){
 
     InterCodeNode* p = irHead;
     bool begin = false;
+
+    Type* lastFunc = NULL;
+    int lastTempCount = 1;
+
+
+    int funcCount = 0;
+    Type* funcList[30];
+
     while((begin && p != irHead) || !begin){
         begin = true;
         InterCode* ic = p->ic;
@@ -128,6 +138,14 @@ void traverseIR(FILE* f){
         Operand* o2 = ic->o2;
         char* relop = ic->relop;
 
+        if(IR_FUNC == tag && (tar->func != lastFunc || lastFunc == NULL)){
+            if(lastFunc != NULL){
+                lastFunc->function.tempSize = -4 * (tempVariableCount - lastTempCount);
+                lastTempCount = tempVariableCount;
+            }
+            lastFunc = tar->func;
+        }
+
         if(IR_LABEL == tag){
             fprintf(f, "LABEL %s :", printOperand(tar));
         }else if(IR_GOTO == tag){
@@ -135,7 +153,10 @@ void traverseIR(FILE* f){
         }else if(IR_IF_GOTO == tag){
             fprintf(f, "IF %s %s %s GOTO %s", printOperand(o1), relop, printOperand(o2), printOperand(tar));
         }else if(IR_FUNC == tag){
-            fprintf(f, "FUNCTION %s :", printOperand(tar));
+            fprintf(f, "FUNCTION %s (dataSize %d):", printOperand(tar), (tar->func->function.dataSize)*(-1)-4);
+            tar->func->function.tempBeginNo = tempVariableCount;
+            funcList[funcCount] = tar->func;
+            funcCount++;
         }else if(IR_PARAM == tag){
             fprintf(f, "PARAM %s", printOperand(tar));
         }else if(IR_DEC == tag){
@@ -167,6 +188,14 @@ void traverseIR(FILE* f){
         }
         fprintf(f, "\n");
         p = p->next;
+    }
+
+    if(lastFunc != NULL){
+    lastFunc->function.tempSize = -4 * (tempVariableCount - lastTempCount);
+    }
+
+    for(int i = 0; i < funcCount; ++i){
+        fprintf(f, "%s (tempSize %d  %d)\n", funcList[i]->name, funcList[i]->function.tempSize, funcList[i]->function.tempBeginNo);
     }
 }
 

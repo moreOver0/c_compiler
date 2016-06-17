@@ -30,7 +30,7 @@ typedef struct Node {
     Type* arraySymbol;
     int arrayLevel;
     union{
-        Operand* place;
+        Operand* place; // 
         struct{
             Operand** argList;
             int argCount;

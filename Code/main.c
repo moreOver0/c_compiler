@@ -29,6 +29,7 @@ int main(int argc, char** argv){
         semanticCheck();
         if(semanticErrorCount <= 0){
             getIR(argv[2]);
+            getAsm(argv[2]);
             // printf("none.\n");
         }
     }

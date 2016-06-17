@@ -121,10 +121,11 @@ void getIR(char* fileName){
     irHead = translate(root);
     if(anyStruct){
         printf("Cannot translate: Code contains variables or parameters of structure type.\n");
-    }else{
-        FILE* file = fopen(fileName, "w");
+    }
+    else{
+        FILE* file = stdout;
         traverseIR(file);
-        fclose(file);
+        // fclose(file);
     }
 }
 
@@ -169,11 +170,15 @@ static InterCodeNode* fundec__id_lp_varlist_rp(Node* n){
 
     Type* func = n->type;
     currentFunction = func;
+    currentFunction->function.dataSize = -4;
     Code code = newInterCodeNodeWithInfo(IR_FUNC, newOperandFunc(func), NULL, NULL);
     Type** paraList = func->function.argv;
     int len = func->function.argc;
+    int paraSize = 0;
     for(int i = 0; i < len; ++i){
         //输出时注意check类型是否是结构体或其他不合法类型
+        paraSize += computeSizeByByte(paraList[i]);
+        paraList[i]->offset = paraSize;
         Code tmp = newInterCodeNodeWithInfo(IR_PARAM, newOperandVar(paraList[i]), NULL, NULL);
         code = concat(code, tmp);
     }
@@ -188,6 +193,7 @@ static InterCodeNode* fundec__id_lp_rp(Node* n){
 
     Type* func = n->type;
     currentFunction = func;
+    currentFunction->function.dataSize = -4;
     Code code = newInterCodeNodeWithInfo(IR_FUNC, newOperandFunc(func), NULL, NULL);
     return code;
 }
@@ -257,8 +263,10 @@ static InterCodeNode* dec__vardec(Node* n){
 
     Type* var = n->type;
     Code code = NULL;
+    int size = computeSizeByByte(var);
+    var->offset = currentFunction->function.dataSize;
+    currentFunction->function.dataSize -= size;
     if(!(var->myType == BASIC_INT || var->myType == BASIC_FLOAT)){
-        int size = computeSizeByByte(var);
         code = newInterCodeNodeWithInfo(IR_DEC, newOperandVar(var), newOperandConstant(size), NULL);
     }
     return code;
@@ -273,6 +281,9 @@ static InterCodeNode* dec__vardec_assignop_exp(Node* n){
 
     // vardec must not be array or struct
     Type* var = n->type;
+    int size = computeSizeByByte(var);
+    var->offset = currentFunction->function.dataSize;
+    currentFunction->function.dataSize -= size;
     assert(var->myType == BASIC_INT || var->myType == BASIC_FLOAT);
     Node* exp = getChild3(n);
     exp->place = newTemp();

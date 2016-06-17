@@ -6,6 +6,7 @@
 typedef struct Type{
     char* name;
     TypeTag typeTag;
+    int offset;
     union{
         /* if array */
         struct{
@@ -20,6 +21,10 @@ typedef struct Type{
             struct Type** argv;
             /* point to type of return-value if return a structure */
             struct Type* ret;
+            /* 4 + size of all data and variables in this function (4 means the link to next instruction) */
+            int dataSize; 
+            int tempSize;
+            int tempBeginNo;
         }function;
 
         /* if definition of structure */
